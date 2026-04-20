@@ -1,0 +1,10 @@
+pandas
+streamlit
+folium
+streamlit-folium
+ortools
+firebase-admin
+streamlit-autorefresh
+plotly
+streamlit-authenticator
+PyYAML

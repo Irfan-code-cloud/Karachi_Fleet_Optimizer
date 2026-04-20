@@ -1,0 +1,9 @@
+Stop_ID,Location_Name,Latitude,Longitude,Demand_KG,Open_Time,Close_Time,Service_Time_Mins
+0,Port of Karachi (Depot),24.8143,66.9856,0,8:00,18:00,0
+1,Dolmen Mall Clifton,24.8105,67.0326,120,10:00,22:00,30
+2,SSAT Degree College,24.9254,67.0305,50,8:30,15:00,15
+3,Virtual University of Pakistan,24.9213,67.094,80,9:00,17:00,15
+4,IBA Karachi Main Campus,24.9405,67.1141,150,8:00,16:00,45
+5,Jinnah International Airport,24.9008,67.1681,200,6:00,23:59,60
+6,Korangi Industrial Area,24.8329,67.1264,300,8:00,18:00,60
+7,Hira Foundation Darul-uloom,24.8166,67.1472,40,8:00,14:00,15
