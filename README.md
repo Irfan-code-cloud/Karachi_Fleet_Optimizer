@@ -51,20 +51,22 @@ This project uses Streamlit Secrets and Firebase. You must provide your own cred
 1. Create a hidden folder and file at the root of the project: `.streamlit/secrets.toml`
 2. Add your custom session cookie key and Firebase Service Account credentials:
 
-    cookie_key = "your_custom_random_string_here"
+```toml
+cookie_key = "your_custom_random_string_here"
 
-    [firebase]
-    type = "service_account"
-    project_id = "your-project-id"
-    private_key_id = "your-private-key-id"
-    private_key = "-----BEGIN PRIVATE KEY-----\nYOUR_KEY_HERE\n-----END PRIVATE KEY-----\n"
-    client_email = "your-service-account-email"
-    client_id = "your-client-id"
-    auth_uri = "https://accounts.google.com/o/oauth2/auth"
-    token_uri = "https://oauth2.googleapis.com/token"
-    auth_provider_x509_cert_url = "https://www.googleapis.com/oauth2/v1/certs"
-    client_x509_cert_url = "your-cert-url"
-    universe_domain = "googleapis.com"
+[firebase]
+type = "service_account"
+project_id = "your-project-id"
+private_key_id = "your-private-key-id"
+private_key = "-----BEGIN PRIVATE KEY-----\nYOUR_KEY_HERE\n-----END PRIVATE KEY-----\n"
+client_email = "your-service-account-email"
+client_id = "your-client-id"
+auth_uri = "https://accounts.google.com/o/oauth2/auth"
+token_uri = "https://oauth2.googleapis.com/token"
+auth_provider_x509_cert_url = "https://www.googleapis.com/oauth2/v1/certs"
+client_x509_cert_url = "your-cert-url"
+universe_domain = "googleapis.com"
+```
 
 ### 4. Run the Application
 
