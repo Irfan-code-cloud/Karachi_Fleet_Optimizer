@@ -2,6 +2,8 @@
 
 **Live Demo:** [Click here to launch the application](https://karachifleetoptimizer-hqthjtkx8gcl2g9df4k5ne.streamlit.app/)
 
+![Manager Dashboard](assets/dasboard.png)
+
 An enterprise-grade, role-based logistics ERP designed to mathematically optimize delivery routes across the sprawling metropolis of Karachi. Built with Python and Streamlit, it leverages Google OR-Tools and OSRM to minimize total fleet distance, significantly reducing daily fuel consumption and operational costs.
 
 ## 🛑 The Problem
@@ -9,6 +11,8 @@ Logistics operations in high-density urban environments like Karachi frequently 
 
 ## 💡 The Solution
 The Karachi Fleet Optimizer tackles this by removing human guesswork. It formulates daily dispatching as a **Capacitated Vehicle Routing Problem with Time Windows (CVRPTW)**. The engine ingests daily demand data, respects strict vehicle weight capacities, and mathematically calculates the absolute minimal-distance routes. Coupled with a Role-Based Access Control (RBAC) portal, it provides real-time telemetry, live Proof of Delivery (POD) tracking, and instant ROI analytics for management.
+
+![Executive ROI Tracking](assets/analytics.png)
 
 ## 🧠 Architecture: Why OSRM?
 For the routing engine's distance matrix, **OSRM (Open Source Routing Machine)** was selected over alternative commercial APIs (like Google Maps Distance Matrix) or pure Euclidean/Haversine calculations for several critical reasons:
@@ -23,6 +27,8 @@ For the routing engine's distance matrix, **OSRM (Open Source Routing Machine)**
 * **Role-Based Access Control:** Mathematically hashed (bcrypt) authentication with distinct views for Admins, Managers, and Drivers.
 * **Real-Time Cloud Sync:** Firebase Realtime Database integration for live delivery tracking and persistent session states.
 * **Interactive Mapping:** Folium-based dynamic maps rendering polyline routes, custom markers, and HTML status tooltips.
+
+![Mobile Driver Portal](assets/driver.png)
 
 ## 🛠️ Tech Stack
 * **Frontend:** Streamlit, Plotly, Folium
