@@ -1,4 +1,5 @@
 import streamlit as st
+import pytz
 import firebase_admin
 from firebase_admin import credentials, db
 import base64
@@ -166,9 +167,10 @@ if len(routes) > 0:
 
     # Callback function to update status DIRECTLY IN THE CLOUD
     def mark_delivered(s_id, data_uri):
-        timestamp = datetime.now().strftime("%Y-%m-%d %I:%M %p")
+        karachi_tz = pytz.timezone('Asia/Karachi')
+        timestamp = datetime.now(karachi_tz).strftime("%Y-%m-%d %I:%M %p")
         db.reference(f'/deliveries/{s_id}').set({
-            "status": "Delivered", 
+            "status": "Delivered",
             "photo_data": data_uri,
             "timestamp": timestamp,
             "override_note": ""
