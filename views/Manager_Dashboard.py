@@ -12,6 +12,26 @@ from firebase_admin import credentials, db
 from datetime import datetime
 import uuid
 import json
+import vertexai
+from vertexai.generative_models import GenerativeModel
+import json
+import os
+
+# --- AI INITIALIZATION FUNCTION ---
+@st.cache_resource
+def load_ai_model():
+    """Initializes the Vertex AI model securely."""
+    if "GCP_SERVICE_ACCOUNT_JSON" in st.secrets:
+        creds_dict = json.loads(st.secrets["GCP_SERVICE_ACCOUNT_JSON"])
+        key_path = "temp_gcp_key.json"
+        with open(key_path, "w") as f:
+            json.dump(creds_dict, f)
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = key_path
+        vertexai.init(project=creds_dict["project_id"], location="us-central1")
+        return GenerativeModel("gemini-2.5-flash")
+    return None
+
+ai_model = load_ai_model()
 
 # Setup Page
 st.set_page_config(page_title="Karachi Fleet Optimizer", layout="wide", page_icon=":material/local_shipping:")
@@ -112,7 +132,7 @@ st.markdown("""
 
 st.title(":material/local_shipping: Karachi Fleet Optimizer")
 # Refresh the page every 30 seconds to fetch live driver updates
-st_autorefresh(interval=30000, key="datarefresh")
+# st_autorefresh(interval=30000, key="datarefresh")
 st.markdown("Optimize your logistics network using mathematically minimal distances across Karachi.")
 
 # Inject this ROI explanation:
@@ -182,6 +202,22 @@ except Exception:
     pass
 
 import uuid
+
+st.sidebar.markdown("### :material/sensors: Live Telemetry")
+# 1. A toggle to turn auto-refresh on or off
+live_sync = st.sidebar.toggle("Enable Live Auto-Sync", value=False)
+
+if live_sync:
+    # If turned on, it refreshes every 60 seconds
+    from streamlit_autorefresh import st_autorefresh
+    st_autorefresh(interval=60000, key="live_sync_refresh")
+    st.sidebar.caption("🟢 Auto-sync is active (60s)")
+else:
+    # 2. A manual button so they can just check for updates when they want to
+    if st.sidebar.button(":material/refresh: Manually Refresh Data", use_container_width=True):
+        st.rerun()
+
+st.sidebar.divider()
 
 st.sidebar.markdown("### :material/folder_open: Zone 1: Data Management")
 
@@ -423,6 +459,49 @@ if st.session_state.fleet_data is not None:
 
         st.divider()
 
+        # --- AI ROUTE EFFICIENCY AUDIT ---
+        if ai_model:
+            # 1. Replaced the emoji with the clean system icon
+            st.markdown("### :material/smart_toy: AI Route Efficiency Audit")
+            
+            if st.button("Run Daily Route Audit"):
+                with st.spinner("AI is analyzing route efficiency and suggesting improvements..."):
+                    # Compile all route data for the AI
+                    all_route_data = ""
+                    for i, route in enumerate(st.session_state.actual_routes):
+                        if route:
+                            route_str = f"Route {i+1}: "
+                            for stop in route:
+                                route_str += f"{stop['Location_Name']} -> "
+                            route_str += "(End)"
+                            all_route_data += route_str + "\n"
+
+                            
+                    current_date = datetime.now().strftime("%B %d, %Y")
+                    prompt = f"""
+                    You are a senior logistics consultant in Karachi. 
+                    Today's date is {current_date}.
+                    We have {len(st.session_state.actual_routes)} optimized routes for today.
+                    Total optimized distance: {total_fleet_distance:.1f} km.
+                    Estimated savings: Rs. {savings_pkr:,.2f}.
+
+                    Here are the routes:
+                    {all_route_data}
+
+                    Please provide a professional audit report with exactly two sections:
+                    1. **Efficiency Analysis:** A short paragraph on how well-optimized the routes are.
+                    2. **Improvement Suggestions:** 2-3 specific, actionable tips to reduce fuel consumption or travel time further.
+                    
+                    Include a formal report header at the very top that includes today's exact date ({current_date}) and your consultant title. Do not invent past dates.
+                    """
+                    try:
+                        response = ai_model.generate_content(prompt)
+                        # 2. Replaced st.info with the sleek, theme-adaptive box
+                        with st.container(border=True):
+                            st.markdown(response.text)
+                    except Exception as e:
+                        st.error(f"Google Cloud Error: {e}")
+
         # Plot Routes
         st.subheader(":material/map: Geographic Route Visualization")
         st.markdown("""
@@ -502,7 +581,7 @@ if st.session_state.fleet_data is not None:
                 arrival = loc.get('Scheduled_Arrival', 'N/A')
                 service = loc.get('Service_Time_Mins', 0)
                 
-# --- PREMIUM HTML TOOLTIP ---
+                # --- PREMIUM HTML TOOLTIP ---
                 # Determine colors for the status badge
                 status_color = "#10B981" if status == "Delivered" else "#3B82F6"
                 status_bg = "#D1FAE5" if status == "Delivered" else "#DBEAFE"
@@ -556,7 +635,7 @@ if st.session_state.fleet_data is not None:
                     "Photo_Data": photo_data
                 })
                 
-# --- CUSTOM PREMIUM MARKERS ---
+                # --- CUSTOM PREMIUM MARKERS ---
                 if status == "Delivered":
                     # Large Green Marker for Completed
                     delivered_html = """
@@ -607,7 +686,7 @@ if st.session_state.fleet_data is not None:
                     icon=custom_icon
                 ).add_to(marker_cluster)
                 
-        st_folium(m, width=900, height=600, returned_objects=[])
+        st_folium(m, use_container_width=True, height=600, returned_objects=[])
         
         st.divider()
         header_col1, spacer, header_col2 = st.columns([5, 2.5, 2.5], vertical_alignment="center")

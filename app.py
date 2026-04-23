@@ -3,45 +3,7 @@ import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
 
-# --- LOGIN PAGE UI & HEADER (ONLY SHOW IF NOT LOGGED IN) ---
-if not st.session_state.get("authentication_status"):
-    
-   # 1. Apply the narrow CSS ONLY to the login screen
-    st.markdown("""
-        <style>
-        .block-container {
-            padding-top: 0 !important;
-            padding-bottom: 1rem !important;
-            max-width: 650px !important; 
-        }
-        footer {
-            display: none !important;
-        }
-        
-        /* Mobile Viewport Overrides for Login Screen */
-        @media screen and (max-width: 768px) {
-            /* Shrink the Main Title */
-            div[data-testid="stMarkdownContainer"] h1 {
-                font-size: 1.6rem !important;
-                margin-bottom: 0.5rem !important;
-                line-height: 1.2 !important;
-            }
-            /* Shrink the "Institutional Access Required" Subheading */
-            div[data-testid="stMarkdownContainer"] h3 {
-                font-size: 1.15rem !important;
-                margin-bottom: 0.5rem !important;
-            }
-            /* Shrink the paragraph text slightly */
-            div[data-testid="stMarkdownContainer"] p {
-                font-size: 0.9rem !important;
-                line-height: 1.4 !important;
-            }
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
 # --- AUTH CONFIGURATION ---
-# In a real app, store these in a secret config or database. 
 hashed_123 = '$2b$12$6pXk0/P.Xn.iB1X.e5v5.uVdYp5f0.m5Gk0.vG5v5.uVdYp5' # Example placeholder
 
 config = {
@@ -91,7 +53,6 @@ config = {
     },
     'cookie': {
         'expiry_days': 30,
-        # This dynamically pulls your hidden key from the vault
         'key': st.secrets.get("cookie_key", "fallback_local_key_only"), 
         'name': 'kfo_auth_cookie'
     },
@@ -109,20 +70,137 @@ authenticator = stauth.Authenticate(
 )
 st.session_state["authenticator"] = authenticator
 
-# --- LOGIN PAGE HEADER (ONLY SHOW IF NOT LOGGED IN) ---
+# =====================================================================
+# THE MAGIC ERASER CONTAINER (Fixes the ghosting glitch!)
+# =====================================================================
+login_container = st.empty()
+
+# --- LOGIN PAGE HEADER & UI (ONLY SHOW IF NOT LOGGED IN) ---
 if not st.session_state.get("authentication_status"):
-    st.title("Karachi Fleet Optimizer")
-    st.markdown("""
-    ### Institutional Access Required
-    Welcome to the Karachi Fleet Optimizer ERP. This system is for authorized personnel only. 
-    Please use your credentials to securely access your dedicated portal.
-    """)
-    st.divider()
+    
+    # We wrap the ENTIRE login UI and footer inside the eraser container
+    with login_container.container():
+        st.markdown("""
+        <style>
+        /* 1. Global Reset & Sidebar Hide */
+        [data-testid="collapsedControl"], [data-testid="stSidebar"], [data-testid="stHeader"] { 
+            display: none !important; 
+        }
+        
+        /* 2. Desktop Layout (Wide) */
+        .block-container { 
+            max-width: 1100px !important; 
+            padding-top: 5rem !important; 
+            padding-bottom: 2rem !important;
+        }
+        
+        /* 3. MOBILE RESPONSIVE OVERRIDES (The Fix) */
+        @media screen and (max-width: 768px) {
+            .block-container {
+                padding-top: 1rem !important;    /* Remove huge top gap */
+                padding-bottom: 0rem !important; /* Remove bottom gap */
+                max-width: 100% !important;
+            }
+            
+            /* Shrink the massive headline for mobile screens */
+            h1 {
+                font-size: 2.2rem !important; 
+                line-height: 1.2 !important;
+                text-align: center !important;
+            }
+            
+            h3 {
+                font-size: 1rem !important;
+                text-align: center !important;
+                margin-bottom: 1.5rem !important;
+            }
 
-# --- LOGIN SCREEN ---
-authenticator.login()
+            /* Reduce padding inside the login card to save screen space */
+            [data-testid="stForm"] {
+                padding: 1.5rem 1rem !important;
+                margin: 0 auto !important;
+            }
+        }
 
+        /* 4. The Form Card Styling */
+        [data-testid="stForm"] {
+            border-radius: 12px !important;
+            box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.2) !important;
+            background-color: var(--secondary-background-color) !important; 
+            border: 1px solid rgba(128, 128, 128, 0.3) !important; 
+        }
+        
+        [data-testid="stForm"] h2 { display: none !important; }
+            
+          /* 6. TRUE FULL-LENGTH MONOCHROME BUTTON */
+          /* This targets the wrapper and the button together to force 100% width */
+            div.stButton, div.stButton > button {
+                width: 100% !important;
+                display: block !important;
+            }
+
+            div.stButton > button {
+                background-color: #1F2937 !important; 
+                color: #FFFFFF !important; 
+                font-size: 1.1rem !important;
+                font-weight: 600 !important;
+                padding: 0.75rem !important; 
+                border-radius: 8px !important;
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                margin-top: 1.5rem !important;
+                transition: all 0.2s ease !important;
+            }
+
+            div.stButton > button:hover {
+                background-color: #374151 !important;
+                border-color: rgba(255, 255, 255, 0.3) !important;
+            }
+            </style>
+        """, unsafe_allow_html=True)
+        
+        left_col, right_col = st.columns([1.2, 1], gap="large", vertical_alignment="center")
+        
+        with left_col:
+            st.markdown("""
+                <h1 style='font-size: 3.8rem; line-height: 1.1; margin-bottom: 1rem;'>
+                    Optimize your<br>fleet operations.
+                </h1>
+                <h3 style='font-weight: 400; font-size: 1.3rem; margin-bottom: 2rem; opacity: 0.8;'>
+                    Secure Institutional Access for Karachi Fleet Optimizer. Manage routes, track live telemetry, and analyze ROI in real-time.
+                </h3>
+            """, unsafe_allow_html=True)
+            
+        with right_col:
+            authenticator.login()
+        
+        # Display the error ONLY inside the login screen
+        if st.session_state.get("authentication_status") is False:
+            st.error('🚨 Institutional ID or password is incorrect.', icon="🛑")
+
+        # --- DEPLOYMENT FOOTER ---
+        st.divider()
+        footer_html = """
+        <div style="text-align: center; color: gray; font-size: small; padding: 10px;">
+            <p>© 2026 FleetLink Solutions (PVT) LTD. All rights reserved.</p>
+            <p>
+                <a href="https://yourdomain.com/privacy" target="_blank" style="color: gray; text-decoration: none;">Privacy Policy</a> 
+                &nbsp; | &nbsp;
+                <a href="https://yourdomain.com/terms" target="_blank" style="color: gray; text-decoration: none;">Terms & Conditions</a>
+            </p>
+            <p style="font-size: x-small;">Unauthorized access is strictly prohibited and subject to legal action under the PECA Act 2016.</p>
+        </div>
+        """
+        st.markdown(footer_html, unsafe_allow_html=True)
+
+
+# =====================================================================
+# THE SECURE APP (Only runs if logged in)
+# =====================================================================
 if st.session_state.get("authentication_status"):
+    
+    # INSTANTLY VAPORIZE THE LOGIN SCREEN CONTAINER!
+    login_container.empty()
+    
     # The user is logged in! Grab their details from the session state
     username = st.session_state["username"]
     name = st.session_state["name"]
@@ -167,24 +245,3 @@ if st.session_state.get("authentication_status"):
     
     # Run the Page
     pg.run()
-
-elif st.session_state.get("authentication_status") is False:
-    st.error('Username/password is incorrect')
-elif st.session_state.get("authentication_status") is None:
-    st.warning('Please enter your username and password')
-
-if not st.session_state.get("authentication_status"):
-# --- DEPLOYMENT FOOTER ---
- st.divider()
- footer_html = """
- <div style="text-align: center; color: gray; font-size: small; padding: 10px;">
-    <p>© 2026 FleetLink Solutions (PVT) LTD. All rights reserved.</p>
-    <p>
-        <a href="https://yourdomain.com/privacy" target="_blank" style="color: gray; text-decoration: none;">Privacy Policy</a> 
-        &nbsp; | &nbsp;
-        <a href="https://yourdomain.com/terms" target="_blank" style="color: gray; text-decoration: none;">Terms & Conditions</a>
-    </p>
-    <p style="font-size: x-small;">Unauthorized access is strictly prohibited and subject to legal action under the PECA Act 2016.</p>
- </div>
-"""
- st.markdown(footer_html, unsafe_allow_html=True)

@@ -9,3 +9,4 @@ plotly
 streamlit-authenticator
 PyYAML
 pytz
+google-cloud-aiplatform

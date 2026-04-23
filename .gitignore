@@ -1,2 +1,4 @@
 firebase_credentials.json
 .streamlit/secrets.toml
+vertex_ai_credentials.json
+temp_gcp_key.json

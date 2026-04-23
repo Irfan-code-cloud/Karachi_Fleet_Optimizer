@@ -3,6 +3,26 @@ import pandas as pd
 import plotly.express as px
 import firebase_admin
 from firebase_admin import credentials, db
+import vertexai
+from vertexai.generative_models import GenerativeModel
+import json
+import os
+
+# --- AI INITIALIZATION FUNCTION ---
+@st.cache_resource
+def load_ai_model():
+    """Initializes the Vertex AI model securely."""
+    if "GCP_SERVICE_ACCOUNT_JSON" in st.secrets:
+        creds_dict = json.loads(st.secrets["GCP_SERVICE_ACCOUNT_JSON"])
+        key_path = "temp_gcp_key.json"
+        with open(key_path, "w") as f:
+            json.dump(creds_dict, f)
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = key_path
+        vertexai.init(project=creds_dict["project_id"], location="us-central1")
+        return GenerativeModel("gemini-2.5-flash")
+    return None
+
+ai_model = load_ai_model()
 
 # Setup Page
 st.set_page_config(page_title="Executive Analytics", layout="wide", page_icon=":material/show_chart:")
@@ -144,6 +164,55 @@ else:
                 value=f"{total_fuel:,.2f} Litres"
             )
     st.divider()
+
+    # --- AI EXECUTIVE SUMMARY & Q&A ---
+    if ai_model:
+        st.markdown("### :material/smart_toy: AI Financial Summary & Assistant")
+        
+        # 1. The Standard Summary Button
+        if st.button("Generate Executive ROI Brief"):
+            with st.spinner("AI is analyzing historical ledger data..."):
+                prompt = f"""
+                You are the Chief Financial Officer (CFO) of Karachi Fleet Optimizer.
+                Write a 3-sentence executive summary highlighting our fleet ROI. 
+                Lifetime savings: Rs. {lifetime_savings:,.2f}. Fuel consumed: {total_fuel:,.2f} Litres over {len(df)} days. 
+                Use a highly professional, confident, and articulate tone suitable for a board meeting.
+                Start directly with the financial insights. Do NOT use time-based greetings like "Good morning" or "Good evening".
+                """
+                try:
+                    response = ai_model.generate_content(prompt)
+                    # Upgraded to adaptive bordered container
+                    with st.container(border=True):
+                        st.markdown(response.text)
+                except Exception as e:
+                    st.error("AI couldn't connect right now.")
+
+        # 2. The Custom Question Input
+        custom_question = st.text_input("Ask the AI CFO a specific question about the ledger data:")
+        
+        # Removed type="primary" to get rid of the red color
+        if custom_question and st.button("Ask AI"):
+            with st.spinner("Calculating response..."):
+                q_prompt = f"""
+                You are the Chief Financial Officer (CFO) advising an executive about the Karachi Fleet Optimizer.
+                
+                Data Context: 
+                - {len(df)} total operational days logged. 
+                - Total lifetime savings generated: Rs. {lifetime_savings:,.2f}. 
+                - Total fuel consumed: {total_fuel:,.2f} Litres.
+                
+                Executive's Question: "{custom_question}"
+                
+                Respond directly to the executive in a conversational, highly professional, and insightful tone. 
+                Provide context to your numbers, and sound like a seasoned financial advisor rather than a robot reading a spreadsheet.
+                """
+                try:
+                    q_response = ai_model.generate_content(q_prompt)
+                    # Upgraded to adaptive bordered container
+                    with st.container(border=True):
+                        st.markdown(f"**CFO:** {q_response.text}")
+                except Exception as e:
+                    st.error("AI couldn't connect right now.")
     
     # --- PREMIUM PLOTLY CHARTS ---
     # Prepare data for plotting (resetting index and formatting date)

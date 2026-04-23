@@ -6,6 +6,26 @@ import base64
 import folium
 from streamlit_folium import st_folium
 from datetime import datetime
+import vertexai
+from vertexai.generative_models import GenerativeModel
+import json
+import os
+
+# --- AI INITIALIZATION FUNCTION ---
+@st.cache_resource
+def load_ai_model():
+    """Initializes the Vertex AI model securely."""
+    if "GCP_SERVICE_ACCOUNT_JSON" in st.secrets:
+        creds_dict = json.loads(st.secrets["GCP_SERVICE_ACCOUNT_JSON"])
+        key_path = "temp_gcp_key.json"
+        with open(key_path, "w") as f:
+            json.dump(creds_dict, f)
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = key_path
+        vertexai.init(project=creds_dict["project_id"], location="us-central1")
+        return GenerativeModel("gemini-2.5-flash")
+    return None
+
+ai_model = load_ai_model()
 
 # Setup Page 
 st.set_page_config(page_title="Driver Portal", page_icon=":material/near_me:", layout="centered")
@@ -131,6 +151,24 @@ if len(routes) > 0:
     
     st.info(f":material/local_shipping: Driver: {selected_truck} | Vehicle Capacity: 500 KG")
 
+    # --- AI DISPATCH BRIEFING ---
+    if ai_model:
+        if st.button(f"Generate Route Briefing for {selected_truck}"):
+            with st.spinner("AI is analyzing your route..."):
+                # Get a few stop names to make it personalized
+                stops_list = ", ".join([loc.get('Location_Name', 'Stop') for loc in truck_route[1:-1]])
+                prompt = f"""
+                You are a logistics dispatcher in Karachi. Write a short, simple, and polite 2-sentence briefing for a driver assigned to {selected_truck}. 
+                They have {len(truck_route)-2} stops today. 
+                Remind them to drive safely in Karachi traffic.
+                """
+                try:
+                    response = ai_model.generate_content(prompt)
+                    st.success(":material/smart_toy: **AI Dispatcher:**")
+                    st.write(response.text)
+                except Exception as e:
+                    st.error("AI couldn't connect right now.")
+
     # --- MOBILE ROUTE MAP ---
     if len(truck_route) > 0:
         # Extract purely standard coordinates directly corresponding to the truck array natively avoiding the OSRM bounds
@@ -208,6 +246,26 @@ if len(routes) > 0:
             st.write(f"**Drop-off:** {stop['Demand_KG']} KG")
             
             c1, c2 = st.columns(2)
+
+            # --- AI TRAFFIC & SAFETY BRIEFING FOR THIS STOP ---
+            if ai_model:
+                if st.button(f"AI Traffic Intel for {stop.get('Location_Name', 'this stop')}", key=f"intel_{stop_id}"):
+                    with st.spinner("Analyzing Karachi traffic patterns..."):
+                        current_time = datetime.now().strftime("%I:%M %p")
+                        prompt = f"""
+                        You are a local Karachi logistics expert. The current time is {current_time}. 
+                        Our delivery driver is heading to: {stop.get('Location_Name', 'an unknown location')}.
+                        
+                        Write exactly two bullet points:
+                        1. **Traffic Context:** A 1-sentence warning about typical traffic conditions or bottlenecks in this specific area of Karachi at this time of day.
+                        2. **Driver Safety:** A 1-sentence hyper-specific safety tip for driving a delivery truck in this area.
+                        """
+                        try:
+                            response = ai_model.generate_content(prompt)
+                            with st.container(border=True):
+                                st.markdown(response.text)
+                        except Exception as e:
+                            st.error("AI Dispatcher is currently offline.")
             
             # 1. Navigation
             maps_url = f"https://www.google.com/maps/dir/?api=1&destination={stop['Latitude']},{stop['Longitude']}"
