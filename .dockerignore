@@ -1,0 +1,8 @@
+.git
+.gitignore
+.streamlit/secrets.toml
+firebase_credentials.json
+temp_gcp_key.json
+vertex_ai_credentials.json
+__pycache__/
+scratch/
