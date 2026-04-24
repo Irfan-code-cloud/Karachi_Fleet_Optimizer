@@ -34,11 +34,25 @@ For the routing engine's distance matrix, **OSRM (Open Source Routing Machine)**
 * **Real-Time Cloud Sync:** Firebase Realtime Database integration for live delivery tracking and persistent session states.
 * **Interactive Mapping:** Folium-based dynamic maps rendering polyline routes, custom markers, and HTML status tooltips.
 
+## 📊 Data Schema: Bring Your Own Fleet
+To make this platform adaptable for any logistics department, the optimization engine is built to ingest a standardized, lightweight dataset. If your company can export these basic data points from your current CRM, Shopify, or order management system, you can plug them directly into the Karachi Fleet Optimizer to immediately start reducing fuel costs.
+
+**Raw CSV Data**
+<img width="805" height="461" alt="Lat_and_Lan_raw_data" src="https://github.com/user-attachments/assets/8bf9368a-b940-49d7-a804-ad04e65d33b9" />
+
+The application parses a standard tabular dataset (CSV/Excel) representing the daily delivery manifest. Here is the required schema:
+
+* `Stop_ID` & `Location_Name`: Unique identifiers for the main distribution hub (Depot) and each customer drop-off location.
+* `Latitude` & `Longitude`: Exact GPS coordinates. These are fed directly into the OSRM engine to calculate real-world street distances and traffic directions, rather than simple straight-line math.
+* `Demand_KG`: The physical weight (or volume) of the delivery. The algorithm uses this to mathematically ensure no assigned truck ever exceeds its maximum payload capacity.
+* `Service_Time_Mins`: The estimated time required for the driver to park, unload the cargo, and collect the Proof of Delivery (POD). This prevents the engine from generating physically impossible schedules.
+* `Open_Time` & `Close_Time`: The strict time windows (e.g., 09:00 to 17:00) during which the customer can accept the delivery. The OR-Tools engine acts on these constraints to avoid early arrivals or missed deliveries.
+
 ## 📖 Platform User Guide (Role-Based Workflows)
 
 This application is compartmentalized into three distinct portals to ensure data security and operational focus. Use the demo credentials provided at the top of this document to explore the system.
 
-### 👔 1. Manager Dashboard (Dispatch & Operations)
+### 1. Manager Dashboard (Dispatch & Operations)
 The nerve center for daily logistics. Managers use this portal to transform raw demand into actionable dispatch orders.
 * **Route Generation:** Ingest daily delivery nodes and vehicle capacity limits. The system triggers OR-Tools and OSRM to mathematically calculate the most efficient path.
 * **Live Fleet Tracking:** Monitor the active geographic visualization of all assigned trucks on an interactive map.
@@ -48,7 +62,7 @@ The nerve center for daily logistics. Managers use this portal to transform raw 
 
 ---
 
-### 🚚 2. Driver Portal (Field Execution)
+### 2. Driver Portal (Field Execution)
 Designed for mobile responsiveness, this portal provides drivers with exact, distraction-free execution steps while on the road.
 * **Route Briefing:** Drivers select their assigned vehicle and receive their mathematically optimized sequence of stops.
 * **Real-Time AI Traffic Intel:** At any stop, drivers can trigger a Vertex AI localized prompt that pulls current Karachi standard time to generate hyper-specific warnings about current bottlenecks and safety hazards for that exact neighborhood.
@@ -58,7 +72,7 @@ Designed for mobile responsiveness, this portal provides drivers with exact, dis
 
 ---
 
-### 📊 3. Executive Analytics (High-Level ROI)
+### 3. Executive Analytics (High-Level ROI)
 A high-level, read-only dashboard designed for upper management and stakeholders.
 * **Financial Overview:** View top-down metrics on total system efficiency, historical fuel consumption, and capital actively recovered by the optimization engine.
 * **Operational Telemetry:** Analyze overall fleet utilization and performance bottlenecks without getting bogged down in individual node or street-level data.
