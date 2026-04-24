@@ -4,9 +4,9 @@
 
 **Demo Access:** `Username: exec_user` | `Password: Fleet@admin2026`
 
-![Manager Dashboard](assets/dasboard.png)
-
 An enterprise-grade, role-based logistics ERP engineered to mathematically optimize delivery routes and financially audit operations across the sprawling, high-density metropolis of Karachi. Built with Python and deployed on Google Cloud Run, it leverages Google OR-Tools for routing and Google Vertex AI for real-time financial telemetry, significantly reducing daily fuel consumption and operational overhead.
+
+<img width="1366" height="2687" alt="manager_dashboard" src="https://github.com/user-attachments/assets/0f1c8659-80d2-4f92-b9ca-6bf9993a98d0" />
 
 ## 🛑 The Urban Logistics Problem
 Logistics operations in chaotic urban environments frequently suffer from severe routing inefficiencies. Manual dispatching leads to overlapping vehicle paths, backtracking, and a failure to meet strict delivery time windows. This results in inflated fuel consumption, excessive vehicle wear-and-tear, unpredicted driver overtime, and ultimately, massive bleeds in capital.
@@ -18,7 +18,7 @@ The Karachi Fleet Optimizer removes human guesswork through a dual-engine approa
 
 Coupled with a Role-Based Access Control (RBAC) portal, it provides real-time tracking, live Proof of Delivery (POD) updates, and instant ROI analytics for executive management.
 
-![Executive ROI Tracking](assets/analytics.png)
+<img width="1366" height="1634" alt="executive_analytics" src="https://github.com/user-attachments/assets/b7c5c684-322d-4450-a10d-fc46139eb6e2" />
 
 ## 🤖 AI Route Efficiency Audit (Powered by Google Vertex AI)
 To move beyond simple distance calculation, this platform integrates **Google Vertex AI** to conduct automated, natural-language operational audits. 
@@ -40,7 +40,7 @@ For the routing engine's distance matrix, **OSRM (Open Source Routing Machine)**
 * **Real-Time Cloud Sync:** Firebase Realtime Database integration for live delivery tracking and persistent session states.
 * **Interactive Mapping:** Folium-based dynamic maps rendering polyline routes, custom markers, and HTML status tooltips.
 
-![Mobile Driver Portal](assets/driver.png)
+<img width="1366" height="2163" alt="driver_portal" src="https://github.com/user-attachments/assets/d55fdcb8-a1ad-45f6-b7b4-7bd4c1856d3d" />
 
 ## 🛠️ Enterprise Tech Stack
 * **Cloud Infrastructure:** Google Cloud Run (Serverless Docker Container), Google Secret Manager
