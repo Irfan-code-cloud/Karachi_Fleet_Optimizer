@@ -158,9 +158,10 @@ if len(routes) > 0:
                 # Get a few stop names to make it personalized
                 stops_list = ", ".join([loc.get('Location_Name', 'Stop') for loc in truck_route[1:-1]])
                 prompt = f"""
-                You are a logistics dispatcher in Karachi. Write a short, simple, and polite 2-sentence briefing for a driver assigned to {selected_truck}. 
-                They have {len(truck_route)-2} stops today. 
+                You are a logistics dispatcher in Karachi. Write a short, simple, and polite 2-sentence briefing for a driver assigned to {selected_truck}.
+                They have {len(truck_route)-2} stops today.
                 Remind them to drive safely in Karachi traffic.
+                CRITICAL INSTRUCTION: Do not use time-specific greetings like "Good morning" or "Good afternoon". Start the message directly with the assignment details.
                 """
                 try:
                     response = ai_model.generate_content(prompt)
