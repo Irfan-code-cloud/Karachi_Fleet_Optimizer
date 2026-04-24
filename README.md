@@ -1,6 +1,6 @@
 # 🚚 Karachi Fleet Optimizer (ERP)
 
-**Live Demo:** [Click here to launch the application](https://karachifleetoptimizer-hqthjtkx8gcl2g9df4k5ne.streamlit.app/)
+**Live Demo:** [Click here to launch the application](https://karachi-fleet-optimizer-521715121219.us-central1.run.app)
 
 ![Manager Dashboard](assets/dasboard.png)
 
