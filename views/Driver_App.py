@@ -10,6 +10,7 @@ import vertexai
 from vertexai.generative_models import GenerativeModel
 import json
 import os
+from zoneinfo import ZoneInfo
 
 # --- AI INITIALIZATION FUNCTION ---
 @st.cache_resource
@@ -252,14 +253,16 @@ if len(routes) > 0:
             if ai_model:
                 if st.button(f"AI Traffic Intel for {stop.get('Location_Name', 'this stop')}", key=f"intel_{stop_id}"):
                     with st.spinner("Analyzing Karachi traffic patterns..."):
-                        current_time = datetime.now().strftime("%I:%M %p")
+                    # Force the server to fetch exact Karachi time instead of US server time
+                        current_time = datetime.now(ZoneInfo("Asia/Karachi")).strftime("%I:%M %p")
+            
                         prompt = f"""
-                        You are a local Karachi logistics expert. The current time is {current_time}. 
+                        You are a local Karachi logistics expert. The current local time is exactly {current_time}.
                         Our delivery driver is heading to: {stop.get('Location_Name', 'an unknown location')}.
-                        
+            
                         Write exactly two bullet points:
-                        1. **Traffic Context:** A 1-sentence warning about typical traffic conditions or bottlenecks in this specific area of Karachi at this time of day.
-                        2. **Driver Safety:** A 1-sentence hyper-specific safety tip for driving a delivery truck in this area.
+                        1. **Traffic Context:** A 1-sentence warning about typical traffic conditions or bottlenecks in this specific area right now at {current_time}.
+                        2. **Driver Safety:** A 1-sentence hyper-specific safety tip for driving a delivery truck in this area considering the current time.
                         """
                         try:
                             response = ai_model.generate_content(prompt)
