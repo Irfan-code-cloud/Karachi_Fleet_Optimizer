@@ -192,6 +192,11 @@ if not st.session_state.get("authentication_status"):
         """
         st.markdown(footer_html, unsafe_allow_html=True)
 
+        # ==========================================
+        # THIS LINE HERE TO FIX THE GHOST GLITCH
+        # ==========================================
+        st.stop()
+        
 
 # =====================================================================
 # THE SECURE APP (Only runs if logged in)
