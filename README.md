@@ -4,6 +4,8 @@
 
 **Demo Access:** `Username: exec_user` | `Password: Fleet@admin2026`
 
+> ⚠️ **Platform Notice:** To optimize cloud resources, this application pauses after periods of inactivity. **Please allow roughly 15 seconds for the engine to cold-boot and wake up upon your first visit.**
+
 An enterprise-grade, role-based logistics ERP engineered to mathematically optimize delivery routes and financially audit operations across the sprawling, high-density metropolis of Karachi. Built with Python and deployed on Google Cloud Run, it leverages Google OR-Tools for routing and Google Vertex AI for real-time financial telemetry, significantly reducing daily fuel consumption and operational overhead.
 
 ## 🛑 The Urban Logistics Problem
