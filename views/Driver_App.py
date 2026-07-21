@@ -169,7 +169,11 @@ if len(routes) > 0:
                     st.success(":material/smart_toy: **AI Dispatcher:**")
                     st.write(response.text)
                 except Exception as e:
-                    st.error("AI couldn't connect right now.")
+                    error_msg = str(e).lower()
+                    if "billing" in error_msg or "403" in error_msg:
+                        st.info("👋 **Notice:** AI Dispatch Briefings are temporarily paused due to cloud limits. Please proceed with your standard route.")
+                    else:
+                        st.error(f"AI Connection Error: {e}")
 
     # --- MOBILE ROUTE MAP ---
     if len(truck_route) > 0:
@@ -269,7 +273,11 @@ if len(routes) > 0:
                             with st.container(border=True):
                                 st.markdown(response.text)
                         except Exception as e:
-                            st.error("AI Dispatcher is currently offline.")
+                            error_msg = str(e).lower()
+                            if "billing" in error_msg or "403" in error_msg:
+                                st.info("👋 **Notice:** AI Traffic Intel is temporarily paused due to cloud limits.")
+                            else:
+                                st.error(f"AI Dispatcher Error: {e}")
             
             # 1. Navigation
             maps_url = f"https://www.google.com/maps/dir/?api=1&destination={stop['Latitude']},{stop['Longitude']}"
