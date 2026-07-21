@@ -500,7 +500,16 @@ if st.session_state.fleet_data is not None:
                         with st.container(border=True):
                             st.markdown(response.text)
                     except Exception as e:
-                        st.error(f"Google Cloud Error: {e}")
+                        error_message = str(e).lower()
+                        # Check if it's the specific Google Cloud billing/403 error
+                        if "billing" in error_message or "403" in error_message:
+                            st.info(
+                                "👋 **Notice:** The AI Route Efficiency Audit is temporarily paused as we have reached our current cloud usage limits. "
+                                "The standard routing features are still perfectly operational. Please check back later!"
+                            )
+                        else:
+                            # Keep the red error ONLY for other unexpected bugs
+                            st.error(f"Google Cloud Error: {e}")
 
         # Plot Routes
         st.subheader(":material/map: Geographic Route Visualization")
