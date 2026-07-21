@@ -185,7 +185,11 @@ else:
                     with st.container(border=True):
                         st.markdown(response.text)
                 except Exception as e:
-                    st.error("AI couldn't connect right now.")
+                    error_msg = str(e).lower()
+                    if "billing" in error_msg or "403" in error_msg:
+                        st.info("👋 **Notice:** The AI Executive Summary is temporarily paused due to cloud usage limits. Your historical data charts below remain fully functional.")
+                    else:
+                        st.error(f"AI Connection Error: {e}")
 
         # 2. The Custom Question Input
         custom_question = st.text_input("Ask the AI CFO a specific question about the ledger data:")
@@ -212,7 +216,11 @@ else:
                     with st.container(border=True):
                         st.markdown(f"**CFO:** {q_response.text}")
                 except Exception as e:
-                    st.error("AI couldn't connect right now.")
+                    error_msg = str(e).lower()
+                    if "billing" in error_msg or "403" in error_msg:
+                        st.info("👋 **Notice:** The AI CFO Assistant is temporarily paused due to cloud usage limits.")
+                    else:
+                        st.error(f"AI Connection Error: {e}")
     
     # --- PREMIUM PLOTLY CHARTS ---
     # Prepare data for plotting (resetting index and formatting date)
